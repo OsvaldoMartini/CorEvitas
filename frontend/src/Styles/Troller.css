@@ -1,0 +1,119 @@
+/* Troller.css */
+
+.troller-container {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+  }
+  
+  .left-column {
+    width: 50%;
+    padding-right: 10px;
+    box-sizing: border-box;
+  }
+  
+  .right-column {
+    width: 50%;
+    padding-left: 10px;
+    box-sizing: border-box;
+  }
+  
+  .history-box {
+    border: 2px solid #000;
+    padding: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  
+  .history-content {
+    display: flex;
+    flex-direction: column-reverse;
+  }
+  
+  .summary-box {
+    border: 1px solid #ccc;
+    padding: 5px;
+    margin-top: 10px;
+  }
+  
+  .products-box {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-top: 10px;
+  }
+  
+  .product-row {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .product-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    border: 1px solid #ccc;
+    width: 25%;
+    height: 50px;
+  }
+  
+  .total-box {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .total-item {
+    border: 1px solid #ccc;
+    padding: 5px;
+    margin-bottom: 5px;
+  }
+  
+  button {
+    padding: 5px 10px;
+    background-color: #f0f0f0;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .product-header {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    border: 1px solid #ccc;
+    padding: 10px;
+  }
+  
+  .product-item-header {
+    width: 25%;
+    text-align: center;
+  }
+  
+  .product-item {
+    width: 25%;
+    text-align: center;
+    border: 1px solid #ccc;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .product-quantity button {
+    padding: 5px 10px;
+    background-color: #f0f0f0;
+    border: none;
+    cursor: pointer;
+  }
+  
+  /* Intercalação de cores no histórico */
+  .history-entry:nth-child(odd) {
+    background-color: #d8f0f5;
+  }
+  
+  .history-entry:nth-child(even) {
+    background-color: #fff;
+  }
+  

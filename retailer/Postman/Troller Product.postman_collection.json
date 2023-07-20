@@ -1,0 +1,159 @@
+{
+	"info": {
+		"_postman_id": "c787c256-d9a3-4348-9c30-44a835387e74",
+		"name": "PPMTool Local Troller Product",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "352629"
+	},
+	"item": [
+		{
+			"name": "Add Product to Troller",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "reportUiUserName",
+						"value": "osvaldo.martini@gmail.com",
+						"type": "text"
+					},
+					{
+						"key": "reportUiUserPwd",
+						"value": "martini",
+						"type": "text"
+					},
+					{
+						"key": "reportUiNickName",
+						"value": "Tempalte",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"CD\",\n\t\"price\":10,\n    \"quantity\":10\n}"
+				},
+				"url": {
+					"raw": "http://localhost:9995/api/product",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9995",
+					"path": [
+						"api",
+						"product"
+					]
+				},
+				"description": "http://localhost:8080/api/users/login"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Product  by Id",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "reportUiUserName",
+						"value": "osvaldo.martini@gmail.com",
+						"type": "text"
+					},
+					{
+						"key": "reportUiUserPwd",
+						"value": "martini",
+						"type": "text"
+					},
+					{
+						"key": "reportUiNickName",
+						"value": "Tempalte",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"productName\": \"CD\",\n\t\"productId\":1,\n    \"quantity\":0,\n    \"price\":100\n}"
+				},
+				"url": {
+					"raw": "http://localhost:9995/api/product/18",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9995",
+					"path": [
+						"api",
+						"product",
+						"18"
+					]
+				},
+				"description": "http://localhost:8080/api/users/login"
+			},
+			"response": []
+		},
+		{
+			"name": "Reduce Product Qty",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "reportUiUserName",
+						"value": "osvaldo.martini@gmail.com",
+						"type": "text"
+					},
+					{
+						"key": "reportUiUserPwd",
+						"value": "martini",
+						"type": "text"
+					},
+					{
+						"key": "reportUiNickName",
+						"value": "Tempalte",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:9995/api/product/reduceQuantity/4?quantity=1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9995",
+					"path": [
+						"api",
+						"product",
+						"reduceQuantity",
+						"4"
+					],
+					"query": [
+						{
+							"key": "quantity",
+							"value": "1"
+						}
+					]
+				},
+				"description": "http://localhost:8080/api/users/login"
+			},
+			"response": []
+		}
+	]
+}
