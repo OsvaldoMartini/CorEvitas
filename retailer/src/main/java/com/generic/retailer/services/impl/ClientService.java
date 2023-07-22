@@ -8,6 +8,7 @@ import com.generic.retailer.payload.request.ProductRequest;
 import com.generic.retailer.types.ProductsTypesEnum;
 import java.io.*;
 import java.text.NumberFormat;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Predicate;
@@ -114,8 +115,11 @@ public class ClientService implements AutoCloseable, CommandLineRunner {
 
     private StringWriter buildReceipt(List<Trolley> trolley) {
         StringWriter receipt = new StringWriter();
-        String dvdTwoForOne = "";
+        String txtDvdTwoForOne = "";
         double twoFroOneDiscount = 0;
+        String txtThursdayDiscount = "";
+        double thursdayDiscTotal = 0;
+
         receipt.append(String.format("===== RECEIPT ======%n"));
 
         Map<String, Long> aggregated = trolley.stream()
@@ -142,19 +146,51 @@ public class ClientService implements AutoCloseable, CommandLineRunner {
                 String format = columnsFormat(
                         maxCol,
                         String.valueOf(ukCurrency.format(-twoFroOneDiscount)).length());
-                dvdTwoForOne = String.format(format, "2 FOR 1", ukCurrency.format(-twoFroOneDiscount));
+                txtDvdTwoForOne = String.format(format, "2 FOR 1", ukCurrency.format(-twoFroOneDiscount));
+
+                long modThursday = entry.getValue() % 2;
+                if (modThursday > 0
+                        && entry.getValue() > 1
+                        && (date.getDayOfWeek().equals(DayOfWeek.THURSDAY))) {
+
+                    thursdayDiscTotal += prodValue * 20 / 100;
+                    format = columnsFormat(
+                            maxCol,
+                            String.valueOf(ukCurrency.format(-thursdayDiscTotal))
+                                    .length());
+                    txtThursdayDiscount = String.format(format, "THURS", ukCurrency.format(-thursdayDiscTotal));
+                }
+            } else if ((entry.getValue() == 1) && (entry.getKey().equalsIgnoreCase("DVD"))) {
+                thursdayDiscTotal += (prodValue * entry.getValue()) * 20 / 100;
+                String format = columnsFormat(
+                        maxCol,
+                        String.valueOf(ukCurrency.format(-thursdayDiscTotal)).length());
+                txtThursdayDiscount = String.format(format, "THURS", ukCurrency.format(-thursdayDiscTotal));
+            }
+
+            if (entry.getKey() != "DVD" && date.getDayOfWeek().equals(DayOfWeek.THURSDAY)) {
+                thursdayDiscTotal += (prodValue * entry.getValue()) * 20 / 100;
+                String format = columnsFormat(
+                        maxCol,
+                        String.valueOf(ukCurrency.format(-thursdayDiscTotal)).length());
+                txtThursdayDiscount = String.format(format, "THURS", ukCurrency.format(-thursdayDiscTotal));
             }
 
             String format = columnsFormat(
                     maxCol, String.valueOf(ukCurrency.format(itemTotal)).length());
             receipt.append(String.format(format, prodName, ukCurrency.format(itemTotal)));
         }
-        if (!dvdTwoForOne.isEmpty()) {
-            receipt.append(dvdTwoForOne);
+        if (!txtDvdTwoForOne.isEmpty()) {
+            receipt.append(txtDvdTwoForOne);
         }
+
+        if (!txtThursdayDiscount.isEmpty()) {
+            receipt.append(txtThursdayDiscount);
+        }
+
         // Summary
         receipt.append(String.format("====================%n"));
-        double totalDouble = summaryReceipt(trolley) - twoFroOneDiscount;
+        double totalDouble = summaryReceipt(trolley) - twoFroOneDiscount - thursdayDiscTotal;
         String format = columnsFormat(
                 maxCol, String.valueOf(ukCurrency.format(totalDouble)).length());
         receipt.append(String.format(format, "TOTAL", ukCurrency.format(totalDouble)));
