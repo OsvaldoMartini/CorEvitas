@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 public class Trolley {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private long productId;
 
     @Column(name = "PRODUCT_NAME")

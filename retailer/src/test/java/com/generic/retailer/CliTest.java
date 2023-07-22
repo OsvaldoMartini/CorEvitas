@@ -1,17 +1,35 @@
 package com.generic.retailer;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 
-import com.generic.retailer.services.impl.ProductServiceImpl;
+import com.generic.retailer.domain.Trolley;
+import com.generic.retailer.model.Book;
+import com.generic.retailer.model.CD;
+import com.generic.retailer.model.DVD;
+import com.generic.retailer.services.impl.ClientService;
+import com.generic.retailer.services.impl.ProductService;
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.List;
+import org.apache.commons.lang3.reflect.FieldUtils;
+import org.apache.commons.lang3.reflect.MethodUtils;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
 public class CliTest {
+
+    private ProductService productService;
+    private ClientService clientService;
+    private Book books = Book.builder().build();
+    private CD cds = CD.builder().build();
+    private DVD dvds = DVD.builder().build();
+    private List<Trolley> trolleyMock;
 
     private static BufferedReader reader(String... lines) {
         StringBuilder builder = new StringBuilder();
@@ -70,28 +88,15 @@ public class CliTest {
     }
 
     @Test
-    public void testReceipt() throws IOException {
+    public void testOnlyReceipt() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        StringWriter writer;
 
-        ProductServiceImpl productServiceImpl = Mockito.mock(ProductServiceImpl.class);
+        Object receipt = MethodUtils.invokeMethod(clientService, true, "buildReceipt", trolleyMock);
 
-        BufferedReader reader = reader("cd", "dvd", "book");
+        assertTrue(receipt instanceof StringWriter);
+        writer = (StringWriter) receipt;
+        assertTrue(writer.toString().split(System.lineSeparator()).length > 0);
 
-        StringWriter writer = new StringWriter();
-        LocalDate notThursday = LocalDate.now();
-        if (notThursday.getDayOfWeek().equals(DayOfWeek.THURSDAY)) {
-            notThursday.plusDays(1);
-        }
-        Cli cli = Mockito.mock(Cli.class);
-
-        cli.books = Book.builder().build();
-        cli.dvds = DVD.builder().build();
-        cli.cds = CD.builder().build();
-        cli.books.add(Book.builder().name("book").price(5).build());
-        cli.cds.add(CD.builder().name("cd").price(10).build());
-        cli.dvds.add(DVD.builder().name("dvd").price(15).build());
-
-        cli.create(">", reader, new BufferedWriter(writer), notThursday);
-        cli.run();
         assertReceipt(
                 writer,
                 "===== RECEIPT ======",
@@ -103,7 +108,47 @@ public class CliTest {
     }
 
     @Test
-    public void testAggregatedReceipt() throws IOException {
+    public void testReceipt()
+            throws IOException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+
+        BufferedReader reader = reader("cd", "dvd", "book");
+        StringWriter writer = new StringWriter();
+        LocalDate notThursday = LocalDate.now();
+        if (notThursday.getDayOfWeek().equals(DayOfWeek.THURSDAY)) {
+            notThursday.plusDays(1);
+        }
+
+        // Prepare Data Tests by Reflection
+        FieldUtils.writeField(clientService, "productService", productService, true);
+        FieldUtils.writeField(clientService, "date", notThursday, true);
+        FieldUtils.writeField(clientService, "reader", reader, true);
+        FieldUtils.writeField(clientService, "writer", new BufferedWriter(writer), true);
+        FieldUtils.writeField(clientService, "prompt", ">", true);
+        MethodUtils.invokeMethod(clientService, true, "initializeProducts");
+
+        when(productService.findAll()).thenReturn(trolleyMock);
+
+        writer = clientService.run();
+        assertTrue(writer instanceof StringWriter);
+
+        Object receipt = MethodUtils.invokeMethod(clientService, true, "buildReceipt", trolleyMock);
+
+        assertTrue(receipt instanceof StringWriter);
+        writer = (StringWriter) receipt;
+        assertTrue(writer.toString().split(System.lineSeparator()).length > 0);
+
+        assertReceipt(
+                writer,
+                "===== RECEIPT ======",
+                "CD            £10.00",
+                "DVD           £15.00",
+                "BOOK           £5.00",
+                "====================",
+                "TOTAL         £30.00");
+    }
+
+    @Test
+    public void testAggregatedReceipt() throws IOException, NoSuchFieldException, IllegalAccessException {
         BufferedReader reader = reader("cd", "cd", "book");
 
         StringWriter writer = new StringWriter();
@@ -111,8 +156,7 @@ public class CliTest {
         if (notThursday.getDayOfWeek().equals(DayOfWeek.THURSDAY)) {
             notThursday.plusDays(1);
         }
-        Cli cli = Mockito.mock(Cli.class);
-        cli.create(">", reader, new BufferedWriter(writer), notThursday);
+        ClientService cli = Mockito.mock(ClientService.class);
         cli.run();
         System.out.println(writer);
         assertReceipt(
@@ -125,7 +169,7 @@ public class CliTest {
     }
 
     @Test
-    public void testDiscountTwoForOne() throws IOException {
+    public void testDiscountTwoForOne() throws IOException, NoSuchFieldException, IllegalAccessException {
         BufferedReader reader = reader("dvd", "dvd", "book");
 
         StringWriter writer = new StringWriter();
@@ -133,8 +177,7 @@ public class CliTest {
         if (notThursday.getDayOfWeek().equals(DayOfWeek.THURSDAY)) {
             notThursday.plusDays(1);
         }
-        Cli cli = Mockito.mock(Cli.class);
-        cli.create(">", reader, new BufferedWriter(writer), notThursday);
+        ClientService cli = Mockito.mock(ClientService.class);
         cli.run();
         assertReceipt(
                 writer,
@@ -147,7 +190,7 @@ public class CliTest {
     }
 
     @Test
-    public void testDiscountThursdays() throws IOException {
+    public void testDiscountThursdays() throws IOException, NoSuchFieldException, IllegalAccessException {
         BufferedReader reader = reader("dvd", "cd", "book");
 
         StringWriter writer = new StringWriter();
@@ -155,8 +198,7 @@ public class CliTest {
         while (!thursday.getDayOfWeek().equals(DayOfWeek.THURSDAY)) {
             thursday.plusDays(1);
         }
-        Cli cli = Mockito.mock(Cli.class);
-        cli.create(">", reader, new BufferedWriter(writer), thursday);
+        ClientService cli = Mockito.mock(ClientService.class);
         cli.run();
         assertReceipt(
                 writer,
@@ -170,7 +212,7 @@ public class CliTest {
     }
 
     @Test
-    public void testDiscount2For1OnThursdays() throws IOException {
+    public void testDiscount2For1OnThursdays() throws IOException, NoSuchFieldException, IllegalAccessException {
         BufferedReader reader = reader("dvd", "dvd", "book");
 
         StringWriter writer = new StringWriter();
@@ -178,8 +220,7 @@ public class CliTest {
         while (!thursday.getDayOfWeek().equals(DayOfWeek.THURSDAY)) {
             thursday.plusDays(1);
         }
-        Cli cli = Mockito.mock(Cli.class);
-        cli.create(">", reader, new BufferedWriter(writer), thursday);
+        ClientService cli = Mockito.mock(ClientService.class);
         cli.run();
         assertReceipt(
                 writer,
@@ -190,5 +231,35 @@ public class CliTest {
                 "THURS         -£1.00",
                 "====================",
                 "TOTAL         £24.00");
+    }
+
+    @Before
+    public void init() throws IOException {
+        productService = Mockito.mock(ProductService.class);
+        books = Book.builder().build();
+        cds = CD.builder().build();
+        dvds = DVD.builder().build();
+        clientService = new ClientService(productService, books, cds, dvds);
+
+        trolleyMock = List.of(new Trolley[] {
+            Trolley.builder()
+                    .productId(1)
+                    .productName("BOOK")
+                    .price(5)
+                    .quantity(1)
+                    .build(),
+            Trolley.builder()
+                    .productId(1)
+                    .productName("DVD")
+                    .price(15)
+                    .quantity(1)
+                    .build(),
+            Trolley.builder()
+                    .productId(1)
+                    .productName("CD")
+                    .price(10)
+                    .quantity(1)
+                    .build()
+        });
     }
 }

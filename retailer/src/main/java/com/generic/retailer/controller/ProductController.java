@@ -1,8 +1,10 @@
 package com.generic.retailer.controller;
 
+import com.generic.retailer.domain.Trolley;
 import com.generic.retailer.payload.request.ProductRequest;
 import com.generic.retailer.payload.response.ProductResponse;
-import com.generic.retailer.services.ProductService;
+import com.generic.retailer.services.IProductService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -15,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @Log4j2
 public class ProductController {
 
-    private final ProductService productService;
+    private final IProductService productService;
 
     @PostMapping
     public ResponseEntity<Long> addProduct(@RequestBody ProductRequest productRequest) {
@@ -54,5 +56,14 @@ public class ProductController {
     @DeleteMapping("/{id}")
     public void deleteProductById(@PathVariable("id") long productId) {
         productService.deleteProductById(productId);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<Trolley>> findAll() {
+
+        log.info("ProductController | findAll is called");
+
+        List<Trolley> trolley = productService.findAll();
+        return new ResponseEntity<>(trolley, HttpStatus.OK);
     }
 }
