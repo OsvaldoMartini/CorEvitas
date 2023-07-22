@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -111,25 +112,31 @@ public class ClientService implements AutoCloseable, CommandLineRunner {
         Arrays.stream(obtained).forEach(p -> System.out.println(p));
     }
 
-    /*
-     * The receipt format should be as per below:
-     *
-     *    "===== RECEIPT ======",
-     *    "DVD           £15.00",
-     *    "CD            £10.00",
-     *    "BOOK           £5.00",
-     *    "THURS         -£6.00",
-     *    "====================",
-     *    "TOTAL         £24.00"
-     */
     private StringWriter buildReceipt(List<Trolley> trolley) {
         StringWriter receipt = new StringWriter();
         receipt.append(String.format("===== RECEIPT ======%n"));
-        trolley.stream().forEach(p -> {
+
+        Map<String, Long> aggregated = trolley.stream()
+                .collect(Collectors.groupingBy(Trolley::getProductName, Collectors.summingLong(Trolley::getProductId)));
+        Iterator<Map.Entry<String, Long>> iterator = aggregated.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, Long> entry = iterator.next();
+            String prodName = entry.getKey();
+            double prodValue = trolley.stream()
+                    .filter(f -> f.getProductName().equalsIgnoreCase(entry.getKey()))
+                    .findFirst()
+                    .get()
+                    .getPrice();
+
+            if (entry.getValue() > 1) {
+                prodName += " (x" + entry.getValue() + ")";
+                prodValue = prodValue * entry.getValue();
+            }
+
             String format = columnsFormat(
-                    maxCol, String.valueOf(ukCurrency.format(p.getPrice())).length());
-            receipt.append(String.format(format, p.getProductName(), ukCurrency.format(p.getPrice())));
-        });
+                    maxCol, String.valueOf(ukCurrency.format(prodValue)).length());
+            receipt.append(String.format(format, prodName, ukCurrency.format(prodValue)));
+        }
         // Summary
         receipt.append(String.format("====================%n"));
         double totalDouble = summaryReceipt(trolley);

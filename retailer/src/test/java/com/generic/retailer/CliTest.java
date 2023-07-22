@@ -135,8 +135,8 @@ public class CliTest {
 
         clientService.run();
 
+        // It builds the receipt for tests
         Object receipt = MethodUtils.invokeMethod(clientService, true, "buildReceipt", trolleyMock);
-
         assertTrue(receipt instanceof StringWriter);
         writer = (StringWriter) receipt;
         assertTrue(writer.toString().split(System.lineSeparator()).length > 0);
@@ -175,6 +175,12 @@ public class CliTest {
         when(productService.findAll()).thenReturn(trolleyMock);
 
         clientService.run();
+
+        // It builds the receipt for tests
+        Object receipt = MethodUtils.invokeMethod(clientService, true, "buildReceipt", trolleyMock);
+        assertTrue(receipt instanceof StringWriter);
+        writer = (StringWriter) receipt;
+        assertTrue(writer.toString().split(System.lineSeparator()).length > 0);
 
         assertReceipt(
                 writer,
@@ -251,7 +257,7 @@ public class CliTest {
     }
 
     @Before
-    public void init() throws IOException {
+    public void init() {
         productService = Mockito.mock(ProductService.class);
         books = Book.builder().build();
         cds = CD.builder().build();
