@@ -60,7 +60,7 @@ public class ClientService implements AutoCloseable, CommandLineRunner {
         writer.flush();
     }
 
-    public StringWriter run() throws IOException {
+    public void run() throws IOException {
         writeLine("What would you like to buy?");
         prompt();
         Optional<String> line = readLine();
@@ -104,8 +104,6 @@ public class ClientService implements AutoCloseable, CommandLineRunner {
 
         writeLine(String.format(
                 "Thank you for visiting Generic Retailer, your total is %s", ukCurrency.format(totalDouble)));
-
-        return receipt;
     }
 
     private void printReceipt(StringWriter receipt) {

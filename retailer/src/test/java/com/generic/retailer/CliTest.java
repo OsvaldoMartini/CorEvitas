@@ -91,6 +91,9 @@ public class CliTest {
     public void testOnlyReceipt() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         StringWriter writer;
 
+        // Trolley with 3 Products
+        trolley3Products();
+
         Object receipt = MethodUtils.invokeMethod(clientService, true, "buildReceipt", trolleyMock);
 
         assertTrue(receipt instanceof StringWriter);
@@ -126,10 +129,11 @@ public class CliTest {
         FieldUtils.writeField(clientService, "prompt", ">", true);
         MethodUtils.invokeMethod(clientService, true, "initializeProducts");
 
+        // Expects Trolley with 3 Products
+        trolley3Products();
         when(productService.findAll()).thenReturn(trolleyMock);
 
-        writer = clientService.run();
-        assertTrue(writer instanceof StringWriter);
+        clientService.run();
 
         Object receipt = MethodUtils.invokeMethod(clientService, true, "buildReceipt", trolleyMock);
 
@@ -148,7 +152,9 @@ public class CliTest {
     }
 
     @Test
-    public void testAggregatedReceipt() throws IOException, NoSuchFieldException, IllegalAccessException {
+    public void testAggregatedReceipt()
+            throws IOException, NoSuchFieldException, IllegalAccessException, InvocationTargetException,
+                    NoSuchMethodException {
         BufferedReader reader = reader("cd", "cd", "book");
 
         StringWriter writer = new StringWriter();
@@ -156,9 +162,20 @@ public class CliTest {
         if (notThursday.getDayOfWeek().equals(DayOfWeek.THURSDAY)) {
             notThursday.plusDays(1);
         }
-        ClientService cli = Mockito.mock(ClientService.class);
-        cli.run();
-        System.out.println(writer);
+        // Prepare Data Tests by Reflection
+        FieldUtils.writeField(clientService, "productService", productService, true);
+        FieldUtils.writeField(clientService, "date", notThursday, true);
+        FieldUtils.writeField(clientService, "reader", reader, true);
+        FieldUtils.writeField(clientService, "writer", new BufferedWriter(writer), true);
+        FieldUtils.writeField(clientService, "prompt", ">", true);
+        MethodUtils.invokeMethod(clientService, true, "initializeProducts");
+
+        // Expects Trolley with Aggregated Products
+        trolleyAggregatedProducts();
+        when(productService.findAll()).thenReturn(trolleyMock);
+
+        clientService.run();
+
         assertReceipt(
                 writer,
                 "===== RECEIPT ======",
@@ -240,7 +257,9 @@ public class CliTest {
         cds = CD.builder().build();
         dvds = DVD.builder().build();
         clientService = new ClientService(productService, books, cds, dvds);
+    }
 
+    private void trolley3Products() {
         trolleyMock = List.of(new Trolley[] {
             Trolley.builder()
                     .productId(1)
@@ -252,6 +271,29 @@ public class CliTest {
                     .productId(1)
                     .productName("DVD")
                     .price(15)
+                    .quantity(1)
+                    .build(),
+            Trolley.builder()
+                    .productId(1)
+                    .productName("CD")
+                    .price(10)
+                    .quantity(1)
+                    .build()
+        });
+    }
+
+    private void trolleyAggregatedProducts() {
+        trolleyMock = List.of(new Trolley[] {
+            Trolley.builder()
+                    .productId(1)
+                    .productName("BOOK")
+                    .price(5)
+                    .quantity(1)
+                    .build(),
+            Trolley.builder()
+                    .productId(1)
+                    .productName("CD")
+                    .price(10)
                     .quantity(1)
                     .build(),
             Trolley.builder()
