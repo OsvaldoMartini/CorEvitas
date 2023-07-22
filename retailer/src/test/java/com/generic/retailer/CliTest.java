@@ -275,7 +275,9 @@ public class CliTest {
     }
 
     @Test
-    public void testDiscount2For1OnThursdays() throws IOException, NoSuchFieldException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    public void testDiscount2For1OnThursdays()
+            throws IOException, NoSuchFieldException, IllegalAccessException, InvocationTargetException,
+                    NoSuchMethodException {
         BufferedReader reader = reader("dvd", "dvd", "book");
 
         StringWriter writer = new StringWriter();
