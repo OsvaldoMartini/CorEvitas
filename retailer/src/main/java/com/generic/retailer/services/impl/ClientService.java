@@ -114,6 +114,8 @@ public class ClientService implements AutoCloseable, CommandLineRunner {
 
     private StringWriter buildReceipt(List<Trolley> trolley) {
         StringWriter receipt = new StringWriter();
+        String dvdTwoForOne = "";
+        double twoFroOneDiscount = 0;
         receipt.append(String.format("===== RECEIPT ======%n"));
 
         Map<String, Long> aggregated = trolley.stream()
@@ -127,19 +129,32 @@ public class ClientService implements AutoCloseable, CommandLineRunner {
                     .findFirst()
                     .get()
                     .getPrice();
-
+            double itemTotal = prodValue;
             if (entry.getValue() > 1) {
                 prodName += " (x" + entry.getValue() + ")";
-                prodValue = prodValue * entry.getValue();
+                itemTotal = prodValue * entry.getValue();
+            }
+
+            //            appliesTwoForOne for DVDs
+            if ((entry.getValue() > 1) && (entry.getKey().equalsIgnoreCase("DVD"))) {
+                twoFroOneDiscount = entry.getValue() / 2;
+                twoFroOneDiscount = prodValue * twoFroOneDiscount;
+                String format = columnsFormat(
+                        maxCol,
+                        String.valueOf(ukCurrency.format(-twoFroOneDiscount)).length());
+                dvdTwoForOne = String.format(format, "2 FOR 1", ukCurrency.format(-twoFroOneDiscount));
             }
 
             String format = columnsFormat(
-                    maxCol, String.valueOf(ukCurrency.format(prodValue)).length());
-            receipt.append(String.format(format, prodName, ukCurrency.format(prodValue)));
+                    maxCol, String.valueOf(ukCurrency.format(itemTotal)).length());
+            receipt.append(String.format(format, prodName, ukCurrency.format(itemTotal)));
+        }
+        if (!dvdTwoForOne.isEmpty()) {
+            receipt.append(dvdTwoForOne);
         }
         // Summary
         receipt.append(String.format("====================%n"));
-        double totalDouble = summaryReceipt(trolley);
+        double totalDouble = summaryReceipt(trolley) - twoFroOneDiscount;
         String format = columnsFormat(
                 maxCol, String.valueOf(ukCurrency.format(totalDouble)).length());
         receipt.append(String.format(format, "TOTAL", ukCurrency.format(totalDouble)));

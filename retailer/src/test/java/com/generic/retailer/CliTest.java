@@ -192,7 +192,9 @@ public class CliTest {
     }
 
     @Test
-    public void testDiscountTwoForOne() throws IOException, NoSuchFieldException, IllegalAccessException {
+    public void testDiscountTwoForOne()
+            throws IOException, NoSuchFieldException, IllegalAccessException, InvocationTargetException,
+                    NoSuchMethodException {
         BufferedReader reader = reader("dvd", "dvd", "book");
 
         StringWriter writer = new StringWriter();
@@ -200,8 +202,26 @@ public class CliTest {
         if (notThursday.getDayOfWeek().equals(DayOfWeek.THURSDAY)) {
             notThursday.plusDays(1);
         }
-        ClientService cli = Mockito.mock(ClientService.class);
-        cli.run();
+        // Prepare Data Tests by Reflection
+        FieldUtils.writeField(clientService, "productService", productService, true);
+        FieldUtils.writeField(clientService, "date", notThursday, true);
+        FieldUtils.writeField(clientService, "reader", reader, true);
+        FieldUtils.writeField(clientService, "writer", new BufferedWriter(writer), true);
+        FieldUtils.writeField(clientService, "prompt", ">", true);
+        MethodUtils.invokeMethod(clientService, true, "initializeProducts");
+
+        // Expects Trolley with Aggregated Products
+        trolleyDiscountTwoForOne();
+        when(productService.findAll()).thenReturn(trolleyMock);
+
+        clientService.run();
+
+        // It builds the receipt for tests
+        Object receipt = MethodUtils.invokeMethod(clientService, true, "buildReceipt", trolleyMock);
+        assertTrue(receipt instanceof StringWriter);
+        writer = (StringWriter) receipt;
+        assertTrue(writer.toString().split(System.lineSeparator()).length > 0);
+
         assertReceipt(
                 writer,
                 "===== RECEIPT ======",
@@ -306,6 +326,29 @@ public class CliTest {
                     .productId(1)
                     .productName("CD")
                     .price(10)
+                    .quantity(1)
+                    .build()
+        });
+    }
+
+    private void trolleyDiscountTwoForOne() {
+        trolleyMock = List.of(new Trolley[] {
+            Trolley.builder()
+                    .productId(1)
+                    .productName("BOOK")
+                    .price(5)
+                    .quantity(1)
+                    .build(),
+            Trolley.builder()
+                    .productId(1)
+                    .productName("DVD")
+                    .price(15)
+                    .quantity(1)
+                    .build(),
+            Trolley.builder()
+                    .productId(1)
+                    .productName("DVD")
+                    .price(15)
                     .quantity(1)
                     .build()
         });
