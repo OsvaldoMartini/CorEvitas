@@ -262,6 +262,7 @@ public class CliTest {
         assertTrue(receipt instanceof StringWriter);
         writer = (StringWriter) receipt;
         assertTrue(writer.toString().split(System.lineSeparator()).length > 0);
+
         assertReceipt(
                 writer,
                 "===== RECEIPT ======",
@@ -274,7 +275,7 @@ public class CliTest {
     }
 
     @Test
-    public void testDiscount2For1OnThursdays() throws IOException, NoSuchFieldException, IllegalAccessException {
+    public void testDiscount2For1OnThursdays() throws IOException, NoSuchFieldException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         BufferedReader reader = reader("dvd", "dvd", "book");
 
         StringWriter writer = new StringWriter();
@@ -282,8 +283,27 @@ public class CliTest {
         while (!thursday.getDayOfWeek().equals(DayOfWeek.THURSDAY)) {
             thursday = thursday.plusDays(1);
         }
-        ClientService cli = Mockito.mock(ClientService.class);
-        cli.run();
+        // Prepare Data Tests by Reflection
+        FieldUtils.writeField(clientService, "productService", productService, true);
+        FieldUtils.writeField(clientService, "date", thursday, true);
+        FieldUtils.writeField(clientService, "reader", reader, true);
+        FieldUtils.writeField(clientService, "writer", new BufferedWriter(writer), true);
+        FieldUtils.writeField(clientService, "prompt", ">", true);
+        MethodUtils.invokeMethod(clientService, true, "initializeProducts");
+
+        // Expects Trolley with Aggregated Products
+        trolleyDiscountTwoForOne();
+
+        when(productService.findAll()).thenReturn(trolleyMock);
+
+        clientService.run();
+
+        // It builds the receipt for tests
+        Object receipt = MethodUtils.invokeMethod(clientService, true, "buildReceipt", trolleyMock);
+        assertTrue(receipt instanceof StringWriter);
+        writer = (StringWriter) receipt;
+        assertTrue(writer.toString().split(System.lineSeparator()).length > 0);
+
         assertReceipt(
                 writer,
                 "===== RECEIPT ======",
@@ -292,7 +312,7 @@ public class CliTest {
                 "2 FOR 1      -£15.00",
                 "THURS         -£1.00",
                 "====================",
-                "TOTAL         £24.00");
+                "TOTAL         £19.00");
     }
 
     @Before
