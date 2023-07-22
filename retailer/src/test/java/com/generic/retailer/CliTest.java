@@ -118,7 +118,7 @@ public class CliTest {
         StringWriter writer = new StringWriter();
         LocalDate notThursday = LocalDate.now();
         if (notThursday.getDayOfWeek().equals(DayOfWeek.THURSDAY)) {
-            notThursday.plusDays(1);
+            notThursday = notThursday.plusDays(1);
         }
 
         // Prepare Data Tests by Reflection
@@ -160,7 +160,7 @@ public class CliTest {
         StringWriter writer = new StringWriter();
         LocalDate notThursday = LocalDate.now();
         if (notThursday.getDayOfWeek().equals(DayOfWeek.THURSDAY)) {
-            notThursday.plusDays(1);
+            notThursday = notThursday.plusDays(1);
         }
         // Prepare Data Tests by Reflection
         FieldUtils.writeField(clientService, "productService", productService, true);
@@ -200,7 +200,7 @@ public class CliTest {
         StringWriter writer = new StringWriter();
         LocalDate notThursday = LocalDate.now();
         if (notThursday.getDayOfWeek().equals(DayOfWeek.THURSDAY)) {
-            notThursday.plusDays(1);
+            notThursday = notThursday.plusDays(1);
         }
         // Prepare Data Tests by Reflection
         FieldUtils.writeField(clientService, "productService", productService, true);
@@ -239,7 +239,7 @@ public class CliTest {
         StringWriter writer = new StringWriter();
         LocalDate thursday = LocalDate.now();
         while (!thursday.getDayOfWeek().equals(DayOfWeek.THURSDAY)) {
-            thursday.plusDays(1);
+            thursday = thursday.plusDays(1);
         }
         ClientService cli = Mockito.mock(ClientService.class);
         cli.run();
@@ -261,7 +261,7 @@ public class CliTest {
         StringWriter writer = new StringWriter();
         LocalDate thursday = LocalDate.now();
         while (!thursday.getDayOfWeek().equals(DayOfWeek.THURSDAY)) {
-            thursday.plusDays(1);
+            thursday = thursday.plusDays(1);
         }
         ClientService cli = Mockito.mock(ClientService.class);
         cli.run();
