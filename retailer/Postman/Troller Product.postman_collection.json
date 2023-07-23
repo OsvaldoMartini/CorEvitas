@@ -35,7 +35,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"name\": \"CD\",\n\t\"price\":10,\n    \"quantity\":10\n}"
+					"raw": "{\n\t\"productId\": \"1\",\n\t\"name\": \"CD\",\n\t\"price\":10,\n    \"quantity\":10\n}"
 				},
 				"url": {
 					"raw": "http://localhost:9995/api/product",
@@ -55,8 +55,11 @@
 		},
 		{
 			"name": "Find All Product",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
 			"request": {
-				"method": "POST",
+				"method": "GET",
 				"header": [
 					{
 						"key": "Content-Type",

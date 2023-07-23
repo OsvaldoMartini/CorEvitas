@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class Trolley {
 
     @Id
-    private long productId;
+    private Integer productId;
 
     @Column(name = "PRODUCT_NAME")
     private String productName;
@@ -23,5 +23,5 @@ public class Trolley {
     private double price;
 
     @Column(name = "QUANTITY")
-    private long quantity;
+    private int quantity;
 }

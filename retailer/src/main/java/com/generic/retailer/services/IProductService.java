@@ -4,16 +4,17 @@ import com.generic.retailer.domain.Trolley;
 import com.generic.retailer.payload.request.ProductRequest;
 import com.generic.retailer.payload.response.ProductResponse;
 import java.util.List;
+import java.util.Optional;
 
 public interface IProductService {
 
-    long addProduct(ProductRequest productRequest);
+    int addProduct(ProductRequest productRequest);
 
-    ProductResponse getProductById(long productId);
+    Optional<ProductResponse> getProductById(int productId);
 
-    void reduceQuantity(long productId, long quantity);
+    void reduceQuantity(int productId, int quantity);
 
-    public void deleteProductById(long productId);
+    public void deleteProductById(int productId);
 
     List<Trolley> findAll();
 }

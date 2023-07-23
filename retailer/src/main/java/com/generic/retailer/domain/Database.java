@@ -1,21 +1,29 @@
 package com.generic.retailer.domain;
 
+import com.generic.retailer.model.Product;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import lombok.Builder;
+import lombok.Value;
 
+@Value
+@Builder
 public class Database {
 
-    private static final List<Trolley> data = new ArrayList();
+    private static final List<Product> data = new ArrayList();
 
-    public void add(Trolley trolley) {
-        data.add(trolley);
+    public void add(Product product) {
+        data.add(product);
     }
 
-    public Trolley find(Integer index) {
-        return data.get(index);
+    public Optional<Product> find(Integer index) {
+        Optional<Product> product =
+                data.stream().filter(d -> d.getProductId().equals(index)).findFirst();
+        return product;
     }
 
-    public List<Trolley> findAll() {
+    public List<Product> findAll() {
         return data;
     }
 }

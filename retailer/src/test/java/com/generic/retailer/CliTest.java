@@ -4,10 +4,8 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
+import com.generic.retailer.domain.Database;
 import com.generic.retailer.domain.Trolley;
-import com.generic.retailer.model.Book;
-import com.generic.retailer.model.CD;
-import com.generic.retailer.model.DVD;
 import com.generic.retailer.services.impl.ClientService;
 import com.generic.retailer.services.impl.ProductService;
 import java.io.*;
@@ -26,9 +24,7 @@ public class CliTest {
 
     private ProductService productService;
     private ClientService clientService;
-    private Book books = Book.builder().build();
-    private CD cds = CD.builder().build();
-    private DVD dvds = DVD.builder().build();
+    private Database data;
     private List<Trolley> trolleyMock;
 
     private static BufferedReader reader(String... lines) {
@@ -89,7 +85,8 @@ public class CliTest {
 
     @Test
     public void testOnlyReceipt() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        StringWriter writer;
+        StringWriter writer = new StringWriter();
+        FieldUtils.writeField(clientService, "writer", new BufferedWriter(writer), true);
 
         // Trolley with 3 Products
         trolley3Products();
@@ -320,10 +317,8 @@ public class CliTest {
     @Before
     public void init() {
         productService = Mockito.mock(ProductService.class);
-        books = Book.builder().build();
-        cds = CD.builder().build();
-        dvds = DVD.builder().build();
-        clientService = new ClientService(productService, books, cds, dvds);
+        data = Database.builder().build();
+        clientService = new ClientService(productService, data);
     }
 
     private void trolley3Products() {

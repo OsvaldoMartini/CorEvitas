@@ -10,9 +10,9 @@ public enum ProductsTypesEnum {
     DVD("DVD", 3);
 
     private final String typeOfProduct;
-    private final long id;
+    private final int id;
 
-    ProductsTypesEnum(String typeOfProduct, long id) {
+    ProductsTypesEnum(String typeOfProduct, int id) {
         this.typeOfProduct = typeOfProduct;
         this.id = id;
     }
@@ -25,7 +25,7 @@ public enum ProductsTypesEnum {
         return Stream.of(ProductsTypesEnum.values());
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 

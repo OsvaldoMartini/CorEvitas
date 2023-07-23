@@ -8,7 +8,7 @@ import lombok.Value;
 @Value
 @Builder(toBuilder = true)
 public class DVD {
-    private long id;
+    private int id;
     private String name;
     private double price;
     private static final List<DVD> dvds = new ArrayList();
@@ -17,7 +17,7 @@ public class DVD {
         dvds.add(DVD);
     }
 
-    public DVD find(Integer index) {
+    public DVD find(int index) {
         return dvds.get(index);
     }
 

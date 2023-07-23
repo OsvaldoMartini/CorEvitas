@@ -7,7 +7,7 @@ import lombok.*;
 @Value
 @Builder
 public class Book {
-    private long id;
+    private int id;
     private String name;
     private double price;
 
@@ -17,7 +17,7 @@ public class Book {
         books.add(book);
     }
 
-    public Book find(Integer index) {
+    public Book find(int index) {
         return books.get(index);
     }
 

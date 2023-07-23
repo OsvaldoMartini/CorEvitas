@@ -8,7 +8,7 @@ import lombok.Value;
 @Value
 @Builder(toBuilder = true)
 public final class CD {
-    private long id;
+    private int id;
     private String name;
     private double price;
 
@@ -18,7 +18,7 @@ public final class CD {
         cds.add(CD);
     }
 
-    public CD find(Integer index) {
+    public CD find(int index) {
         return cds.get(index);
     }
 

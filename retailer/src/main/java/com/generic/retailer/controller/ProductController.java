@@ -5,6 +5,7 @@ import com.generic.retailer.payload.request.ProductRequest;
 import com.generic.retailer.payload.response.ProductResponse;
 import com.generic.retailer.services.IProductService;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -31,18 +32,18 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductResponse> getProductById(@PathVariable("id") long productId) {
+    public ResponseEntity<ProductResponse> getProductById(@PathVariable("id") int productId) {
 
         log.info("ProductController | getProductById is called");
 
         log.info("ProductController | getProductById | productId : " + productId);
 
-        ProductResponse productResponse = productService.getProductById(productId);
-        return new ResponseEntity<>(productResponse, HttpStatus.OK);
+        Optional<ProductResponse> productResponse = productService.getProductById(productId);
+        return new ResponseEntity<>(productResponse.get(), HttpStatus.OK);
     }
 
     @PutMapping("/reduceQuantity/{id}")
-    public ResponseEntity<Void> reduceQuantity(@PathVariable("id") long productId, @RequestParam long quantity) {
+    public ResponseEntity<Void> reduceQuantity(@PathVariable("id") int productId, @RequestParam int quantity) {
 
         log.info("ProductController | reduceQuantity is called");
 
@@ -54,7 +55,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteProductById(@PathVariable("id") long productId) {
+    public void deleteProductById(@PathVariable("id") int productId) {
         productService.deleteProductById(productId);
     }
 
